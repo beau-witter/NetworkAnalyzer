@@ -92,7 +92,7 @@ jobs:
           path: coveragereports
     
   build:
-    if: ${{ success() && startsWith( github.ref, 'refs/tags/' ) }}
+    if: ${{ success() }}
 
     name: 'Build Module'
     needs: test
