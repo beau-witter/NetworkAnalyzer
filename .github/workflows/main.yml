@@ -113,7 +113,7 @@ jobs:
       
       - name: Build ${{ env.ModuleName }} Module
         run: |
-          $credential = New-Object System.Management.Automation.PSCredential (${{ github.repository_owner }}, (ConvertTo-SecureString ${{ secrets.GITHUB_TOKEN }} -AsPlainText -Force))
+          $credential = New-Object System.Management.Automation.PSCredential ("${{ github.repository_owner }}", (ConvertTo-SecureString ${{ secrets.GITHUB_TOKEN }} -AsPlainText -Force))
           Invoke-Build -Task Build -Configuration Release -Sourcelocation ${{ env.GitHubPackageUri }} -Credential $credential
 
       - name: Create NuGet Package

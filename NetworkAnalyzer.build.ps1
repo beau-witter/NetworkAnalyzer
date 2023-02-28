@@ -118,7 +118,6 @@ task Test {
 
 # Synopsis: Generate a new module version if creating a release build
 task GenerateNewModuleVersion -If ($Configuration -eq 'Release') {
-    #TODO: Make this work for psgallery instead of nuget feed (or setup nuget feed in github)
     # Using the current NuGet package version from the feed as a version base when building via Azure DevOps pipeline
 
     # Define package repository name
