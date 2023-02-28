@@ -21,7 +21,7 @@ on:
 
 env:
   ModuleName: 'NetworkAnalyzer'
-  GitHubPackageUri: 'https://nuget.pkg.github.com/beau-witter/index.json'
+  GitHubPackageUri: 'https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json'
 
 jobs:
   test:
@@ -147,7 +147,8 @@ jobs:
           Expand-Archive -Path "${{ env.PublishPath }}/*.nupkg" -DestinationPath ./publish/${{ env.ModuleName }}
 
           # GitHub Packages
-          Publish-Module -Path ./publish/${{ env.ModuleName }} -Repository ${{ env.GitHubPackageUri }} -NuGetApiKey ${{ secrets.GITHUB_TOKEN }}
+          Register-PSRepository -Name GitHubPackages -SourceLocation ${{ env.GitHubPackageUri }} -PublishLocation ${{ env.GitHubPackageUri }}
+          Publish-Module -Path ./publish/${{ env.ModuleName }} -Repository GitHubPackages -NuGetApiKey ${{ secrets.GITHUB_TOKEN }}
           
           # IMPORTANT to prevent duplicate [Content_Types].xml from existing from PSGallery
           Remove-Item -Path "./publish/${{ env.ModuleName }}/[Content_Types].xml"
