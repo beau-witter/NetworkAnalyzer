@@ -1,0 +1,143 @@
+name: NetworkAnalyzer CI
+
+defaults:
+  run:
+    shell: pwsh
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - '*'
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  ModuleName: 'NetworkAnalyzer'
+
+jobs:
+  test:
+    name: 'Run Module Tests'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install InvokeBuild module on the build agent
+        run: |
+          if(-not (Get-Module -Name InvokeBuild -ListAvailable)) {
+            Install-Module InvokeBuild -Force
+          }
+          Import-Module InvokeBuild
+      
+      - name: Analyze Code with PSScriptAnalyzer
+        run: Invoke-Build -Task Analyze
+
+      - name: Publish Analysis Results
+        uses: EnricoMi/publish-unit-test-result-action@v2.4.2
+        if: always()
+        with:
+          comment_mode: off
+          files: "build/**/AnalysisResults_PS*.xml"
+          check_name: "Analysis Results"
+
+      - name: Upload Analysis Results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: ${{ env.ModuleName }}-Analysis-Results
+          path: build/**/AnalysisResults_PS*.xml
+
+      - name: Test Code with Pester Tests
+        run: Invoke-Build -Task Test
+
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2.4.2
+        if: success() || failure()
+        with:
+          comment_mode: off
+          files: "build/**/TestResults_PS*.xml"
+          check_name: "Test Results"
+      
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v3
+        if: success() || failure()
+        with:
+          name: ${{ env.ModuleName }}-Test-Results
+          path: build/**/TestResults_PS*.xml
+      
+      - name: Verify Code Coverage
+        run: Invoke-Build -Task CodeCoverage
+
+      - name: Generate Code Coverage Report
+        uses: danielpalme/ReportGenerator-GitHub-Action@5.1.18
+        with:
+          reports: build/**/CodeCoverageResults_PS*.xml
+          targetDir: coveragereports
+          sourceDirs: ${{ env.ModuleName }}
+          title: ${{ env.ModuleName }} Code Coverage
+      
+      - name: Upload Code Coverage Results
+        uses: actions/upload-artifact@v3
+        if: success() || failure()
+        with:
+          name: ${{ env.ModuleName }}-Code-Coverage-Results
+          path: coveragereports
+    
+  build:
+    if: ${{ success() && github.ref == 'refs/heads/main' }}
+
+    name: 'Build Module'
+    needs: test
+    runs-on: ubuntu-latest
+
+    env:
+      PublishLocation: 'publish'
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install InvokeBuild module on the build agent
+        run: |
+          if(-not (Get-Module -Name InvokeBuild -ListAvailable)) {
+            Install-Module InvokeBuild -Force
+          }
+          Import-Module InvokeBuild
+      
+      - name: Build ${{ env.ModuleName }} Module
+        run: Invoke-Build -Task Build -Configuration Release -Sourcelocation '${{ env.ModuleName }}'
+
+      - name: Create NuGet Package
+        run: |
+          $nuspecFile = (Get-ChildItem -Filter "*.nuspec" -Path "./build" -Recurse).FullName
+          nuget pack $nuspecFile -OutputDirectory ${{ env.PublishLocation }}
+      
+      - name: Upload NuGet Package Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.ModuleName }}
+          path: ${{ env.PublishLocation }}
+
+  publish:
+    if: ${{ success() && startsWith( 'refs/tags/', github.ref ) }}
+
+    name: 'Publish Module'
+    needs: build
+    runs-on: ubuntu-latest
+
+    env:
+      PublishPath: ${{ github.workspace }}/Deploy
+
+    steps:
+      - name: Download Module Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ env.ModuleName }}
+          path: "${{ env.PublishPath }}"
+
+      - name: Publish Module to PSGallery
+        run: |
+          Expand-Archive -Path "${{ env.PublishPath }}/*.nupkg" -DestinationPath ./publish/${{ env.ModuleName }}
+          Publish-Module -Path ./publish/${{ env.ModuleName }} -NuGetApiKey ${{ secrets.PSGALLERY }}

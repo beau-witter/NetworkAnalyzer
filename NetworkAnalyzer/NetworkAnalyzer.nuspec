@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>NetworkAnalyzer</id>
+    <version>0.0.1</version>
+    <authors>Beau Witter</authors>
+    <description>Powershell Module that can be used to detect internet speeds, reset net adapter, and more. </description>
+    <copyright>(c) Beau Witter.</copyright>
+    <licenseUrl>https://github.com/beau-witter/NetworkAnalyzer/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/beau-witter/NetworkAnalyzer</projectUrl>
+    <tags>Speed Test SpeedTest Network</tags>
+    <title>Network Analyzer</title>
+    <releaseNotes>https://github.com/beau-witter/NetworkAnalyzer/blob/main/CHANGELOG.md</releaseNotes>
+  </metadata>
+</package>
