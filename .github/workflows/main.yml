@@ -17,6 +17,7 @@ on:
 
 env:
   ModuleName: 'NetworkAnalyzer'
+  GitHubPackageUri: 'https://nuget.pkg.github.com/beau-witter/index.json'
 
 jobs:
   test:
@@ -107,7 +108,7 @@ jobs:
           Import-Module InvokeBuild
       
       - name: Build ${{ env.ModuleName }} Module
-        run: Invoke-Build -Task Build -Configuration Release -Sourcelocation '${{ env.ModuleName }}'
+        run: Invoke-Build -Task Build -Configuration Release -Sourcelocation ${{ env.GitHubPackageUri }}
 
       - name: Create NuGet Package
         run: |
@@ -137,7 +138,15 @@ jobs:
           name: ${{ env.ModuleName }}
           path: "${{ env.PublishPath }}"
 
-      - name: Publish Module to PSGallery
+      - name: Publish Module to PSGallery and GitHub Packages
         run: |
           Expand-Archive -Path "${{ env.PublishPath }}/*.nupkg" -DestinationPath ./publish/${{ env.ModuleName }}
+
+          # GitHub Packages
+          Publish-Module -Path ./publish/${{ env.ModuleName }} -Repository ${{ env.GitHubPackageUri }} -NuGetApiKey ${{ secrets.GITHUB_TOKEN }}
+          
+          # IMPORTANT to prevent duplicate [Content_Types].xml from existing from PSGallery
+          Remove-Item -Path "./publish/${{ env.ModuleName }}/[Content_Types].xml"
+
+          # PSGallery
           Publish-Module -Path ./publish/${{ env.ModuleName }} -NuGetApiKey ${{ secrets.PSGALLERY }}

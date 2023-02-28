@@ -66,7 +66,7 @@ task Analyze {
         }
     }
 
-    # Additional parameters on Azure Pipelines agents to generate test results
+    # Additional parameters on GitHub Actions runners to generate test results
     if ($env:GITHUB_WORKSPACE) {
         if (-not (Test-Path -Path $buildOutputPath -ErrorAction SilentlyContinue)) {
             New-Item -Path $buildOutputPath -ItemType Directory
@@ -97,7 +97,7 @@ task Test {
         }
     }
 
-    # Additional parameters on Azure Pipelines agents to generate test results
+    # Additional parameters on GitHub Actions runners to generate test results
     if ($env:GITHUB_WORKSPACE) {
         if (-not (Test-Path -Path $buildOutputPath -ErrorAction SilentlyContinue)) {
             New-Item -Path $buildOutputPath -ItemType Directory
@@ -114,6 +114,7 @@ task Test {
 
 # Synopsis: Generate a new module version if creating a release build
 task GenerateNewModuleVersion -If ($Configuration -eq 'Release') {
+    #TODO: Make this work for psgallery instead of nuget feed (or setup nuget feed in github)
     # Using the current NuGet package version from the feed as a version base when building via Azure DevOps pipeline
 
     # Define package repository name
@@ -274,7 +275,7 @@ task CodeCoverage {
         }
     }
 
-    # Additional parameters on Azure Pipelines agents to generate code coverage report
+    # Additional parameters on GitHub Actions runners to generate code coverage report
     if ($env:GITHUB_WORKSPACE) {
         if (-not (Test-Path -Path $buildOutputPath -ErrorAction SilentlyContinue)) {
             New-Item -Path $buildOutputPath -ItemType Directory
