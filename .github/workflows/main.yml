@@ -87,7 +87,7 @@ jobs:
           path: coveragereports
     
   build:
-    if: ${{ success() && startsWith( 'refs/tags/', github.ref ) }}
+    if: ${{ success() && startsWith( github.ref, 'refs/tags/' ) }}
 
     name: 'Build Module'
     needs: test
@@ -121,7 +121,7 @@ jobs:
           path: ${{ env.PublishLocation }}
 
   publish:
-    if: ${{ success() && startsWith( 'refs/tags/', github.ref ) }}
+    if: ${{ success() && startsWith( github.ref, 'refs/tags/' ) }}
 
     name: 'Publish Module'
     needs: build
