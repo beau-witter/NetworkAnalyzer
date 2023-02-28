@@ -87,7 +87,7 @@ jobs:
           path: coveragereports
     
   build:
-    if: ${{ success() && github.ref == 'refs/heads/main' }}
+    if: ${{ success() && startsWith( 'refs/tags/', github.ref ) }}
 
     name: 'Build Module'
     needs: test
