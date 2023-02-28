@@ -112,7 +112,9 @@ jobs:
           Import-Module InvokeBuild
       
       - name: Build ${{ env.ModuleName }} Module
-        run: Invoke-Build -Task Build -Configuration Release -Sourcelocation ${{ env.GitHubPackageUri }}
+        run: |
+          $credential = New-Object System.Management.Automation.PSCredential (${{ github.repository_owner }}, (ConvertTo-SecureString ${{ secrets.GITHUB_TOKEN }} -AsPlainText -Force))
+          Invoke-Build -Task Build -Configuration Release -Sourcelocation ${{ env.GitHubPackageUri }} -Credential $credential
 
       - name: Create NuGet Package
         run: |
@@ -147,11 +149,11 @@ jobs:
           Expand-Archive -Path "${{ env.PublishPath }}/*.nupkg" -DestinationPath ./publish/${{ env.ModuleName }}
 
           # GitHub Packages
-          Register-PSRepository -Name GitHubPackages -SourceLocation ${{ env.GitHubPackageUri }} -PublishLocation ${{ env.GitHubPackageUri }}
-          Publish-Module -Path ./publish/${{ env.ModuleName }} -Repository GitHubPackages -NuGetApiKey ${{ secrets.GITHUB_TOKEN }}
+          Register-PSRepository -Name "${{ env.ModuleName }}-repository" -SourceLocation ${{ env.GitHubPackageUri }} -PublishLocation ${{ env.GitHubPackageUri }}
+          Publish-Module -Path ./publish/${{ env.ModuleName }} -NuGetApiKey ${{ secrets.GITHUB_TOKEN }} -Repository "${{ env.ModuleName }}-repository" 
           
           # IMPORTANT to prevent duplicate [Content_Types].xml from existing from PSGallery
           Remove-Item -Path "./publish/${{ env.ModuleName }}/[Content_Types].xml"
 
           # PSGallery
-          Publish-Module -Path ./publish/${{ env.ModuleName }} -NuGetApiKey ${{ secrets.PSGALLERY }}
+          Publish-Module -Path ./publish/${{ env.ModuleName }} -NuGetApiKey ${{ secrets.PSGALLERY }} -Repository PSGallery 

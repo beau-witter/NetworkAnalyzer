@@ -12,7 +12,7 @@
 RootModule = 'NetworkAnalyzer.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.0.2'
+ModuleVersion = '0.0.1'
 
 # Supported PSEditions
 CompatiblePSEditions = 'Core'
@@ -24,7 +24,7 @@ GUID = 'e20a26b5-9f7a-46f9-bea3-5cd2902aad09'
 Author = 'Beau Witter'
 
 # Company or vendor of this module
-# CompanyName = ''
+CompanyName = ''
 
 # Copyright statement for this module
 Copyright = '(c) Beau Witter.'

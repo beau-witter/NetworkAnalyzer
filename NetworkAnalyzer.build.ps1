@@ -16,7 +16,11 @@ Param (
     [Parameter(ValueFromPipelineByPropertyName = $true)]
     [ValidateNotNullOrEmpty()]
     [String]
-    $SourceLocation
+    $SourceLocation,
+    [Parameter(ValueFromPipelineByPropertyName = $true)]
+    [ValidateNotNullOrEmpty()]
+    [System.Management.Automation.PSCredential]
+    $Credential
 )
 
 Set-StrictMode -Version Latest
@@ -122,7 +126,7 @@ task GenerateNewModuleVersion -If ($Configuration -eq 'Release') {
 
     # Register a target PSRepository
     try {
-        Register-PSRepository -Name $repositoryName -SourceLocation $SourceLocation -InstallationPolicy Trusted
+        Register-PSResourceRepository -Name $repositoryName -URI $SourceLocation -Trusted
     }
     catch {
         throw "Cannot register '$repositoryName' repository with source location '$SourceLocation'!"
@@ -133,7 +137,8 @@ task GenerateNewModuleVersion -If ($Configuration -eq 'Release') {
 
     try {
         # Look for the module package in the repository
-        $existingPackage = Find-Module -Name $moduleName -Repository $repositoryName
+        Find-PSResource -Name $moduleName -Repository $repositoryName
+        $existingPackage = Find-Module -Name $moduleName -Repository $repositoryName -Credential $Credential
     }
     # In no existing module package was found, the base module version defined in the script will be used
     catch {
@@ -143,7 +148,6 @@ task GenerateNewModuleVersion -If ($Configuration -eq 'Release') {
     # If existing module package was found, try to install the module
     if ($existingPackage) {
         # Get the largest module version
-        # $currentModuleVersion = (Get-Module -Name $moduleName -ListAvailable | Measure-Object -Property 'Version' -Maximum).Maximum
         $currentModuleVersion = New-Object -TypeName 'System.Version' -ArgumentList ($existingPackage.Version)
 
         # Set module version base numbers
@@ -153,7 +157,7 @@ task GenerateNewModuleVersion -If ($Configuration -eq 'Release') {
 
         try {
             # Install the existing module from the repository
-            Install-Module -Name $moduleName -Repository $repositoryName -RequiredVersion $existingPackage.Version
+            Install-PSResource -Name $moduleName -Repository $repositoryName -RequiredVersion $existingPackage.Version -Credential $Credential
         }
         catch {
             throw "Cannot import module '$moduleName'!"
