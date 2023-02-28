@@ -7,9 +7,9 @@ defaults:
 on:
   push:
     paths-ignore:
-      - *.md
-      - .gitignore
-      - LICENSE
+      - '*.md'
+      - '.gitignore'
+      - 'LICENSE'
     branches:
       - main
     tags:
