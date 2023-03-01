@@ -45,11 +45,10 @@ Enter-Build {
     $script:moduleName = 'NetworkAnalyzer'
     $script:moduleSourcePath = Join-Path -Path $BuildRoot -ChildPath $moduleName
     $script:moduleManifestPath = Join-Path -Path $moduleSourcePath -ChildPath "$moduleName.psd1"
-    $script:nuspecPath = Join-Path -Path $moduleSourcePath -ChildPath "$moduleName.nuspec"
     $script:buildOutputPath = Join-Path -Path $BuildRoot -ChildPath 'build'
 
     # Setting base module version and using it if building locally
-    $script:newModuleVersion = New-Object -TypeName 'System.Version' -ArgumentList (0, 0, 1)
+    $script:newModuleVersion = (Import-PowerShellDataFile $moduleManifestPath).ModuleVersion
 
     # Setting the list of functions ot be exported by module
     $script:functionsToExport = (Test-ModuleManifest $moduleManifestPath).ExportedFunctions
@@ -118,18 +117,13 @@ task Test {
 
 # Synopsis: Generate a new module version if creating a release build
 task GenerateNewModuleVersion -If ($Configuration -eq 'Release') {
-    # Using the current NuGet package version from the feed as a version base when building via Azure DevOps pipeline
+    # Using the current NuGet package version from the feed as a version base when building via GitHub Actions Workflow
 
     # Define package repository name
     $repositoryName = $moduleName + '-repository'
 
     # Register a target PSRepository
-    try {
-        Register-PSResourceRepository -Name $repositoryName -URI $SourceLocation -Trusted
-    }
-    catch {
-        throw "Cannot register '$repositoryName' repository with source location '$SourceLocation'!"
-    }
+    Register-PSResourceRepository -Name $repositoryName -URI $SourceLocation -Trusted
 
     # Define variable for existing package
     $existingPackage = $null
@@ -210,22 +204,8 @@ task UpdateModuleManifest GenerateNewModuleVersion, GenerateListOfFunctionsToExp
     Update-ModuleManifest @Params
 }
 
-# Synopsis: Update the NuGet package specification with module version
-task UpdatePackageSpecification GenerateNewModuleVersion, {
-    # Load the specification into XML object
-    $xml = New-Object -TypeName 'XML'
-    $xml.Load($nuspecPath)
-
-    # Update package version
-    $metadata = Select-XML -Xml $xml -XPath '//package/metadata'
-    $metadata.Node.Version = $newModuleVersion
-
-    # Save XML object back to the specification file
-    $xml.Save($nuspecPath)
-}
-
 # Synopsis: Build the project
-task Build UpdateModuleManifest, UpdatePackageSpecification, {
+task Build UpdateModuleManifest, {
     # Warning on local builds
     if ($Configuration -eq 'Debug') {
         Write-Warning "Creating a debug build. Use it for test purpose only!"
