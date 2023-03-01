@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0), 
 
 ## [Unreleased]
 
-## [0.0.2] - 2023-02-28
+## [0.1.0] - 2023-03-01
 
 ### Added
 
@@ -21,6 +21,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0), 
 - This changelog file.
 - Metadata to Module nuspec file.
 
-[unreleased]: https://github.com/beau-witter/NetworkAnalyzer/compare/v0.0.2...HEAD
-[0.0.2]: https://github.com/beau-witter/NetworkAnalyzer/releases/tag/v0.0.2
+[unreleased]: https://github.com/beau-witter/NetworkAnalyzer/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/beau-witter/NetworkAnalyzer/releases/tag/v0.1.0
 [0.0.1]: https://github.com/beau-witter/NetworkAnalyzer/releases/tag/v0.0.1
