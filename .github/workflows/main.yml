@@ -93,7 +93,7 @@ jobs:
           path: coveragereports
     
   build:
-    if: ${{ success() }}
+    if: ${{ success() && github.event != 'pull_request'}}
 
     name: 'Build Module'
     needs: test
