@@ -116,16 +116,11 @@ jobs:
           $credential = New-Object System.Management.Automation.PSCredential ("${{ github.repository_owner }}", (ConvertTo-SecureString ${{ secrets.PAT }} -AsPlainText -Force))
           Invoke-Build -Task Build -Configuration Release -Sourcelocation ${{ env.GitHubPackageUri }} -Credential $credential
 
-      - name: Create NuGet Package
-        run: |
-          $nuspecFile = (Get-ChildItem -Filter "*.nuspec" -Path "./build" -Recurse).FullName
-          nuget pack $nuspecFile -OutputDirectory ${{ env.PublishLocation }}
-      
-      - name: Upload NuGet Package Artifact
+      - name: Upload Module Artifact
         uses: actions/upload-artifact@v3
         with:
           name: ${{ env.ModuleName }}
-          path: ${{ env.PublishLocation }}
+          path: ./build
 
   publish:
     if: ${{ success() && startsWith( github.ref, 'refs/tags/' ) }}
@@ -146,14 +141,14 @@ jobs:
 
       - name: Publish Module to PSGallery and GitHub Packages
         run: |
-          Expand-Archive -Path "${{ env.PublishPath }}/*.nupkg" -DestinationPath ./publish/${{ env.ModuleName }}
-
-          # IMPORTANT to prevent duplicate [Content_Types].xml from existing
-          Remove-Item -Path "./publish/${{ env.ModuleName }}/[Content_Types].xml"
+          if(-not (Get-Module PowerShellGet -ListAvailable | Where-Object {$_.Version -gt "3.0.0"}))
+          {
+            Install-Module -Name PowerShellGet -AllowPrerelease -Force
+          }
 
           # GitHub Packages
-          Register-PSRepository -Name "${{ env.ModuleName }}-repository" -SourceLocation ${{ env.GitHubPackageUri }} -PublishLocation ${{ env.GitHubPackageUri }}
-          Publish-Module -Path ./publish/${{ env.ModuleName }} -NuGetApiKey ${{ secrets.GITHUB_TOKEN }} -Repository "${{ env.ModuleName }}-repository" 
+          Register-PSResourceRepository -Name "${{ env.ModuleName }}-repository" -URI ${{ env.GitHubPackageUri }} -Trusted
+          Publish-PSResource -Path ${{ env.PublishPath }}/${{ env.ModuleName }} -ApiKey ${{ secrets.GITHUB_TOKEN }} -Repository "${{ env.ModuleName }}-repository" 
           
           # PSGallery
-          Publish-Module -Path ./publish/${{ env.ModuleName }} -NuGetApiKey ${{ secrets.PSGALLERY }} -Repository PSGallery 
+          Publish-PSResource -Path ${{ env.PublishPath }}/${{ env.ModuleName }} -ApiKey ${{ secrets.PSGALLERY }} -Repository PSGallery

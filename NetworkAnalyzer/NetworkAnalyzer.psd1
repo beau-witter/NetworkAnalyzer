@@ -12,7 +12,7 @@
 RootModule = 'NetworkAnalyzer.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.1.0'
+ModuleVersion = '0.0.3'
 
 # Supported PSEditions
 CompatiblePSEditions = 'Core'
@@ -27,10 +27,10 @@ Author = 'Beau Witter'
 CompanyName = ''
 
 # Copyright statement for this module
-Copyright = '(c) Beau Witter.'
+Copyright = '(c) Beau Witter. All rights reserved.'
 
 # Description of the functionality provided by this module
-Description = 'Powershell Module that can be used to detect internet speeds, reset net adapter, and more. '
+Description = 'Powershell Module that can be used to detect internet speeds, reset net adapter, and more.'
 
 # Minimum version of the PowerShell engine required by this module
 PowerShellVersion = '7.0'
@@ -95,19 +95,19 @@ PrivateData = @{
     PSData = @{
 
         # Tags applied to this module. These help with module discovery in online galleries.
-        # Tags = @()
+        Tags = 'SpeedTest','PSModule','Network'
 
         # A URL to the license for this module.
-        # LicenseUri = ''
+        LicenseUri = 'https://github.com/beau-witter/NetworkAnalyzer/blob/main/LICENSE'
 
         # A URL to the main website for this project.
-        # ProjectUri = ''
+        ProjectUri = 'https://github.com/beau-witter/NetworkAnalyzer'
 
         # A URL to an icon representing this module.
         # IconUri = ''
 
         # ReleaseNotes of this module
-        # ReleaseNotes = ''
+        ReleaseNotes = 'https://github.com/beau-witter/NetworkAnalyzer/blob/main/CHANGELOG.md'
 
         # Prerelease string of this module
         # Prerelease = ''
