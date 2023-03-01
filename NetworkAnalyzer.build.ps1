@@ -136,8 +136,7 @@ task GenerateNewModuleVersion -If ($Configuration -eq 'Release') {
 
     try {
         # Look for the module package in the repository
-        Find-PSResource -Name $moduleName -Repository $repositoryName
-        $existingPackage = Find-Module -Name $moduleName -Repository $repositoryName -Credential $Credential
+        $existingPackage = Find-PSResource -Name $moduleName -Repository $repositoryName -Credential $Credential
     }
     # In no existing module package was found, the base module version defined in the script will be used
     catch {
