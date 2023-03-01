@@ -115,15 +115,19 @@ task Test {
     Invoke-Pester -Configuration $config
 }
 
-# Synopsis: Generate a new module version if creating a release build
-task GenerateNewModuleVersion -If ($Configuration -eq 'Release') {
-    # Using the current NuGet package version from the feed as a version base when building via GitHub Actions Workflow
+# Synopsis: Generate a new module version if creating a debug build
+task GenerateNewModuleVersion -If ($Configuration -eq 'Debug') {
+    # Using the current NuGet package version from the feed as a version base
+    # to decide what the Module Manifest version should be set to.
 
     # Define package repository name
     $repositoryName = $moduleName + '-repository'
 
     # Register a target PSRepository
-    Register-PSResourceRepository -Name $repositoryName -URI $SourceLocation -Trusted
+    if(-not (Get-PSResourceRepository | Where-Object {$_.Name -eq $repositoryName}))
+    {
+        Register-PSResourceRepository -Name $repositoryName -URI $SourceLocation -Trusted
+    }
 
     # Define variable for existing package
     $existingPackage = $null
@@ -138,7 +142,7 @@ task GenerateNewModuleVersion -If ($Configuration -eq 'Release') {
     }
 
     # If existing module package was found, try to install the module
-    if ($existingPackage) {
+    if ($existingPackage -and $existingPackage.Version -gt $Script:newModuleVersion) {
         # Get the largest module version
         $currentModuleVersion = New-Object -TypeName 'System.Version' -ArgumentList ($existingPackage.Version)
 
