@@ -96,7 +96,7 @@ jobs:
 
     name: 'Build Module'
     needs: test
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     env:
       PublishLocation: 'publish'
