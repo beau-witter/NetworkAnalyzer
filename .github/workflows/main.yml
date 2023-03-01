@@ -148,12 +148,12 @@ jobs:
         run: |
           Expand-Archive -Path "${{ env.PublishPath }}/*.nupkg" -DestinationPath ./publish/${{ env.ModuleName }}
 
+          # IMPORTANT to prevent duplicate [Content_Types].xml from existing
+          Remove-Item -Path "./publish/${{ env.ModuleName }}/[Content_Types].xml"
+
           # GitHub Packages
           Register-PSRepository -Name "${{ env.ModuleName }}-repository" -SourceLocation ${{ env.GitHubPackageUri }} -PublishLocation ${{ env.GitHubPackageUri }}
           Publish-Module -Path ./publish/${{ env.ModuleName }} -NuGetApiKey ${{ secrets.GITHUB_TOKEN }} -Repository "${{ env.ModuleName }}-repository" 
           
-          # IMPORTANT to prevent duplicate [Content_Types].xml from existing from PSGallery
-          Remove-Item -Path "./publish/${{ env.ModuleName }}/[Content_Types].xml"
-
           # PSGallery
           Publish-Module -Path ./publish/${{ env.ModuleName }} -NuGetApiKey ${{ secrets.PSGALLERY }} -Repository PSGallery 

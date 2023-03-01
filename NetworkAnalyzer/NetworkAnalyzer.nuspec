@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>NetworkAnalyzer</id>
-    <version>0.0.1</version>
+    <version>0.1.0</version>
     <authors>Beau Witter</authors>
     <description>Powershell Module that can be used to detect internet speeds, reset net adapter, and more. </description>
     <copyright>(c) Beau Witter.</copyright>
