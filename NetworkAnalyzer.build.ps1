@@ -153,13 +153,8 @@ task GenerateNewModuleVersion -If ($Configuration -eq 'Release') {
         [int]$Minor = $currentModuleVersion.Minor
         [int]$Build = $currentModuleVersion.Build
 
-        try {
-            # Install the existing module from the repository
-            Install-PSResource -Name $moduleName -Repository $repositoryName -Version $existingPackage.Version.ToString() -Credential $Credential
-        }
-        catch {
-            throw "Cannot import module '$moduleName'!"
-        }
+        # Install the existing module from the repository
+        Install-PSResource -Name $moduleName -Repository $repositoryName -Version $existingPackage.Version.ToString() -Credential $Credential
 
         # Get the count of exported module functions
         $existingFunctionsCount = (Get-Command -Module $moduleName | Where-Object -Property Version -EQ $existingPackage.Version | Measure-Object).Count
