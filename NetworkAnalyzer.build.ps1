@@ -155,7 +155,7 @@ task GenerateNewModuleVersion -If ($Configuration -eq 'Release') {
 
         try {
             # Install the existing module from the repository
-            $existingPackage | Install-PSResource -Credential $Credential
+            Install-PSResource -Name $moduleName -Repository $repositoryName -Version $existingPackage.Version -Credential $Credential
         }
         catch {
             throw "Cannot import module '$moduleName'!"
