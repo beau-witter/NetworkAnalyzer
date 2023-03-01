@@ -146,9 +146,11 @@ jobs:
             Install-Module -Name PowerShellGet -AllowPrerelease -Force
           }
 
+          $psd1File = (Get-ChildItem -Path ${{ env.PublishPath }} -Recurse -Filter "${{ env.ModuleName }}.psd1").FullName
+
           # GitHub Packages
           Register-PSResourceRepository -Name "${{ env.ModuleName }}-repository" -URI ${{ env.GitHubPackageUri }} -Trusted
-          Publish-PSResource -Path "${{ env.PublishPath }}/${{ env.ModuleName }}/**/**/*.psd1" -ApiKey ${{ secrets.GITHUB_TOKEN }} -Repository "${{ env.ModuleName }}-repository" 
+          Publish-PSResource -Path $psd1File -ApiKey ${{ secrets.GITHUB_TOKEN }} -Repository "${{ env.ModuleName }}-repository" 
           
           # PSGallery
-          Publish-PSResource -Path "${{ env.PublishPath }}/${{ env.ModuleName }}/**/**/*.psd1" -ApiKey ${{ secrets.PSGALLERY }} -Repository PSGallery
+          Publish-PSResource -Path $psd1File -ApiKey ${{ secrets.PSGALLERY }} -Repository PSGallery
