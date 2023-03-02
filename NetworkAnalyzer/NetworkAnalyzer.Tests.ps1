@@ -68,8 +68,12 @@ Describe "'<_>' Function Tests" -ForEach $functionPaths {
     $AstSearchDelegate = { $args[0] -is [System.Management.Automation.Language.FunctionDefinitionAst] }
     $ParsedFunction = $AbstractSyntaxTree.FindAll( $AstSearchDelegate, $true ) | Where-Object Name -eq $_.BaseName
 
+    $parameters = @()
     # Getting the list of function parameters
-    $parameters = @($ParsedFunction.Body.ParamBlock.Parameters.name.VariablePath.Foreach{ $_.ToString() })
+    if($ParsedFunction.Body.ParamBlock.Parameters)
+    {
+      $parameters = @($ParsedFunction.Body.ParamBlock.Parameters.name.VariablePath.Foreach{ $_.ToString() })
+    }
   }
 
   BeforeAll {
@@ -97,7 +101,7 @@ Describe "'<_>' Function Tests" -ForEach $functionPaths {
 
     It "should have tests" {
       Test-Path ($functionPath -replace ".ps1", ".Tests.ps1") | Should -Be $true
-      ($functionPath -replace ".ps1", ".Tests.ps1") | Should -FileContentMatch "Describe `"'$functionName'"
+      ($functionPath -replace ".ps1", ".Tests.ps1") | Should -FileContentMatch "Describe '$functionName'"
     }
   }
 
