@@ -1,11 +1,8 @@
 BeforeAll {
-    $here = Split-Path -Parent $PSCommandPath
-    $sut = (Split-Path -Leaf $PSCommandPath) -replace '\.Tests\.', '.'
-    . "$here\$sut"
+    Import-Module 'NetworkAnalyzer'
 }
 
-Describe "'Get-RandomGuid' Function Functional Tests" {
-
+Describe 'Get-RandomGuid' {
     Context "Accepting input data" {
         BeforeAll {
             #region Arrange
