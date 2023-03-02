@@ -28,7 +28,6 @@ Set-StrictMode -Version Latest
 # Synopsis: Default task
 task . Clean, Build
 
-
 # Install build dependencies
 Enter-Build {
 
@@ -52,6 +51,11 @@ Enter-Build {
 
     # Setting the list of functions ot be exported by module
     $script:functionsToExport = (Test-ModuleManifest $moduleManifestPath).ExportedFunctions
+
+    if(-not $env:PSModulePath.Contains("$BuildRoot;"))
+    {
+        $env:PSModulePath = "$BuildRoot$([IO.Path]::PathSeparator)$env:PSModulePath"
+    }
 }
 
 # Synopsis: Analyze the project with PSScriptAnalyzer
