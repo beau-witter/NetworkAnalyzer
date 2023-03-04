@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0), 
 
 - Test-IsElevated private function. Allows for better explanation for certain actions' availability.
 - Restart-NetAdapter public function. Now we can restart a net adapter as a network-fixing step.
+- ScriptToProcess "GoLangSetup". Ensures that both GoLang exists and is configured for our use.
 
 ### Fixed
 
