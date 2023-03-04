@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0), 
 
 ## [Unreleased]
 
+### Added
+
+- Test-IsElevated private function. Allows for better explanation for certain actions' availability.
+- Restart-NetAdapter public function. Now we can restart a net adapter as a network-fixing step.
+
+### Fixed
+
+- Ensure PSModule path is set properly for smoother testing.
+- Allow for functions to have no params and still pass the module analyzer.
+
 ## [0.1.0] - 2023-03-01
 
 ### Added
