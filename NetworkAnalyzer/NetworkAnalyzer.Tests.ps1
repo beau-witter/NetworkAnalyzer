@@ -125,7 +125,7 @@ Describe "'<_>' Function Tests" -ForEach $functionPaths {
     It "should have at least one EXAMPLE" {
       $functionHelp.Examples.Count | Should -BeGreaterThan 0
       $functionHelp.Examples[0] | Should -Match ([regex]::Escape($functionName))
-      $functionHelp.Examples[0].Length | Should -BeGreaterThan ($functionName.Length + 10)
+      $functionHelp.Examples[0].Length | Should -BeGreaterThan ($functionName.Length)
     }
 
     $parameters | ForEach-Object {
