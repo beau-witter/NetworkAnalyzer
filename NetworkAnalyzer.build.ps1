@@ -52,7 +52,7 @@ Enter-Build {
     # Setting the list of functions ot be exported by module
     $script:functionsToExport = (Test-ModuleManifest $moduleManifestPath).ExportedFunctions
 
-    if(-not $env:PSModulePath.Contains("$BuildRoot;"))
+    if(-not $env:PSModulePath.Contains("$BuildRoot$([IO.Path]::PathSeparator)"))
     {
         $env:PSModulePath = "$BuildRoot$([IO.Path]::PathSeparator)$env:PSModulePath"
     }
