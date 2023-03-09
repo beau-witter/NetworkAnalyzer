@@ -7,7 +7,7 @@
         and then turns it back on. Only able to do so if in an elevated process.
 
     .PARAMETER NetAdapterName
-        Name of the Net Adapter to restart. If none given, the Net Adapter with
+        [string] Name of the Net Adapter to restart. If none given, the Net Adapter with
         the most received bytes will be selected to restart.
 
     .EXAMPLE
