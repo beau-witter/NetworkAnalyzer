@@ -23,11 +23,11 @@ function Measure-NetworkSpeed {
     [CmdletBinding()]
     param()
 
-    New-Item -ItemType Directory -Path ./ -Name tmp | Out-Null
+    New-Item -ItemType Directory -Path $HOME -Name tmp -Force | Out-Null
     Write-Host "Running Speed Test..."
-    $timeResults = Measure-Command -Expression { Start-Process -FilePath "./bin/ndt7-client.exe" -ArgumentList "-format json" -NoNewWindow -Wait -RedirectStandardOutput "./tmp/speedtestresults.txt" }
+    $timeResults = Measure-Command -Expression { Start-Process -FilePath "./bin/ndt7-client.exe" -ArgumentList "-format json" -NoNewWindow -Wait -RedirectStandardOutput "$HOME/tmp/speedtestresults.txt" }
     Write-Verbose "The speed test took $($timeResults.TotalSeconds) seconds."
-    $results = Get-Content -Path C:\Users\justc\OneDrive\Desktop\results.txt | Select-String -Pattern 'FQDN' | ConvertFrom-JSON
-    Remove-Item -Path "./tmp" -Force -Recurse
+    $results = Get-Content -Path "$HOME/tmp/speedtestresults.txt" | Select-String -Pattern 'FQDN' | ConvertFrom-JSON
+    Remove-Item -Path "$HOME/tmp" -Force -Recurse
     $results
 }
