@@ -39,47 +39,70 @@
         Author: Beau Witter
 #>
 function Start-SpeedTest {
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = "PercentThreshold")]
     param (
-        [Parameter(Mandatory = $true)][single] $MaximumDownload,
-        [Parameter(Mandatory = $true)][single] $MaximumUpload,
-        [Parameter()][single] $UpperBoundPercent = 70,
-        [Parameter()][single] $LowerBoundPercent = 40,
+        [Parameter()][string] $Mode = "Basic",
+        [Parameter(ParameterSetName = "PercentThreshold")][single] $MaximumDownload,
+        [Parameter(ParameterSetName = "PercentThreshold")][single] $MaximumUpload,
+        [Parameter(ParameterSetName = "PercentThreshold")][single] $MaximumPing,
+        [Parameter(ParameterSetName = "PercentThreshold")][single] $MaximumPacketLoss,
+        [Parameter(ParameterSetName = "PercentThreshold")][ValidateRange(0,1)][single] $UpperBoundPercent = 0.70,
+        [Parameter(ParameterSetName = "PercentThreshold")][ValidateRange(0,1)][single] $LowerBoundPercent = 0.40,
+        [Parameter(ParameterSetName = "AbsoluteThreshold")][single] $UpperDownloadThreshold,
+        [Parameter(ParameterSetName = "AbsoluteThreshold")][single] $LowerDownloadThreshold,
+        [Parameter(ParameterSetName = "AbsoluteThreshold")][single] $UpperUploadThreshold,
+        [Parameter(ParameterSetName = "AbsoluteThreshold")][single] $LowerUploadThreshold,
+        [Parameter(ParameterSetName = "AbsoluteThreshold")][single] $UpperPingThreshold,
+        [Parameter(ParameterSetName = "AbsoluteThreshold")][single] $LowerPingThreshold,
+        [Parameter(ParameterSetName = "AbsoluteThreshold")][single] $UpperPacketLossThreshold,
+        [Parameter(ParameterSetName = "AbsoluteThreshold")][single] $LowerPacketLossThreshold,
+        [Parameter()][string] $ConfigFilePath = "$HOME/network-analyzer.config",
         [Parameter()][switch] $NoToast,
-        [Parameter()][switch] $NoCLI
+        [Parameter()][switch] $NoCLI,
+        [Parameter()][switch] $PassThru
     )
 
-    if($NoToast -and $NoCLI)
+    # Read Configuration
+    # Read-NetworkAnalyzerConfiguration
+
+    if($NoToast -and $NoCLI -and (-not $PassThru))
     {
-        throw "You cannot disable both Toast and CLI output."
+        throw "You cannot disable Toast, CLI, and PassThru output."
     }
-
-    Write-Verbose "Obtaining Speed Test"
+    
+    # Run Speed Test
     $speedTestResults = Measure-NetworkSpeed
-
-    #TODO: Get-SpeedStatus
-
+    
+    # Format Results
+    switch($Mode) {
+        "Basic" {
+            $download = Format-MetricResults -RawMetricResults $speedTestResults.Download -Basic
+            $upload = Format-MetricResults -RawMetricResults $speedTestResults.Upload -Basic
+            $ping = Format-MetricResults -RawMetricResults $speedTestResults.MinRTT -Basic
+            $packetLoss = Format-MetricResults -RawMetricResults $speedTestResults.DownloadRetrans -Basic
+        }
+        "PercentThreshold" {
+            $download = Format-MetricResults -RawMetricResults $speedTestResults.Download -UpperThreshold ($UpperBoundPercent * $MaximumDownload) -LowerThreshold ($LowerBoundPercent * $MaximumDownload)
+            $upload = Format-MetricResults -RawMetricResults $speedTestResults.Upload -UpperThreshold ($UpperBoundPercent * $MaximumUpload) -LowerThreshold ($LowerBoundPercent * $MaximumUpload)
+            $ping = Format-MetricResults -RawMetricResults $speedTestResults.MinRTT -UpperThreshold ($UpperBoundPercent * $MaximumPing) -LowerThreshold ($LowerBoundPercent * $MaximumPing) -Inverse
+            $packetLoss = Format-MetricResults -RawMetricResults $speedTestResults.DownloadRetrans -UpperThreshold ($UpperBoundPercent * $MaximumPacketLoss) -LowerThreshold ($LowerBoundPercent * $MaximumPacketLoss) -Inverse
+        }
+        "AbsoluteThreshold" {
+            $download = Format-MetricResults -RawMetricResults $speedTestResults.Download -UpperThreshold $UpperDownloadThreshold -LowerThreshold $LowerDownloadThreshold
+            $upload = Format-MetricResults -RawMetricResults $speedTestResults.Upload -UpperThreshold $UpperUploadThreshold -LowerThreshold $LowerUploadThreshold
+            $ping = Format-MetricResults -RawMetricResults $speedTestResults.MinRTT -UpperThreshold $UpperPingThreshold -LowerThreshold $LowerPingThreshold -Inverse
+            $packetLoss = Format-MetricResults -RawMetricResults $speedTestResults.DownloadRetrans -UpperThreshold $UpperPacketLossThreshold -LowerThreshold $LowerPacketLossThreshold -Inverse
+        }
+    }
+    
+    # Prepare Output
     $output = [PSCustomObject][Ordered] @{
-        Download = [PSCustomObject][Ordered] @{
-            Speed = "$("{0:0.##}" -f $speedTestResults.Download.Value) $($speedTestResults.Download.Unit)"
-            Status = "" #TODO: Add download status here
-        }
-        Upload = [PSCustomObject][Ordered] @{
-            Speed = "$("{0:0.##}" -f $speedTestResults.Upload.Value) $($speedTestResults.Upload.Unit)"
-            Status = "" #TODO: Add upload status here
-        }
-        Ping = "$("{0:0.#}" -f $speedTestResults.MinRTT.Value) $($speedTestResults.MinRTT.Unit)" #TODO: Add way to determine ping status
-        PacketLoss = "$("{0:0.##}" -f $speedTestResults.DownloadRetrans.Value)$($speedTestResults.DownloadRetrans.Unit)" #TODO: Add way to determine packet loss status
+        Download = $download
+        Upload = $upload
+        Ping = $ping
+        PacketLoss = $packetLoss
     }
 
-    #TODO: Handle output via another function? Would make sense given I pass in the Output object and use the statuses on it to determine the output
-    # if(-not $NoCLI)
-    # {
-    #     $output
-    # }
-    # if(-not $NoToast)
-    # {
-    #     New-BurntToastNotification -UniqueIdentifier "download" -Text "Download Results", "Speed: $downloadText`nPing: $pingText" -AppLogo $downloadIconPath
-    #     New-BurntToastNotification -UniqueIdentifier "upload" -Text "Upload Results", "Speed: $uploadText" -AppLogo $uploadIconPath
-    # }
+    # Write Output
+    Write-SpeedTestResults -SpeedTestResults $output -PassThru:$PassThru -NoCli:$NoCLI -NoToast:$NoToast
 }
