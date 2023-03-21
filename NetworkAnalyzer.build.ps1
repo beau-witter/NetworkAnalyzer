@@ -43,6 +43,7 @@ Enter-Build {
     # Setting build script variables
     $script:moduleName = 'NetworkAnalyzer'
     $script:moduleSourcePath = Join-Path -Path $BuildRoot -ChildPath $moduleName
+    $script:testSourcePath = Join-Path -Path $BuildRoot -ChildPath "Tests"
     $script:moduleManifestPath = Join-Path -Path $moduleSourcePath -ChildPath "$moduleName.psd1"
     $script:buildOutputPath = Join-Path -Path $BuildRoot -ChildPath 'build'
 
@@ -91,7 +92,8 @@ task Analyze {
 # Synopsis: Test the project with Pester tests
 task Test {
     # Get-ChildItem parameters
-    $testFiles = Get-ChildItem -Path $moduleSourcePath -Recurse -Include "*.Tests.*"
+    $testFiles = Get-ChildItem -Path $testSourcePath -Recurse -Include "*.Tests.*"
+    $testFiles += Get-ChildItem -Path $moduleSourcePath -Recurse -Include "*.Tests.*"
 
     # Pester parameters
     $config = New-PesterConfiguration @{
@@ -101,6 +103,9 @@ task Test {
         }
         TestResult = @{
             Enabled = $true
+        }
+        Output = @{
+            Verbosity = "Detailed"
         }
     }
 

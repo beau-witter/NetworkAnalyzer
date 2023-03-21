@@ -54,10 +54,10 @@ $here = Split-Path -Parent $PSCommandPath
 # Dynamically defining the functions to test
 $functionPaths = @()
 if (Test-Path -Path "$here\Private\*.ps1") {
-  $functionPaths += Get-ChildItem -Path "$here\Private\*.ps1" -Exclude "*.Tests.*"
+  $functionPaths += Get-ChildItem -Path "$here\Private\*.ps1"
 }
 if (Test-Path -Path "$here\Public\*.ps1") {
-  $functionPaths += Get-ChildItem -Path "$here\Public\*.ps1" -Exclude "*.Tests.*"
+  $functionPaths += Get-ChildItem -Path "$here\Public\*.ps1"
 }
 
 Describe "'<_>' Function Tests" -ForEach $functionPaths {
@@ -100,8 +100,10 @@ Describe "'<_>' Function Tests" -ForEach $functionPaths {
     }
 
     It "should have tests" {
-      Test-Path ($functionPath -replace ".ps1", ".Tests.ps1") | Should -Be $true
-      ($functionPath -replace ".ps1", ".Tests.ps1") | Should -FileContentMatch "Describe '$functionName'"
+      $slash = [IO.Path]::DirectorySeparatorChar
+      $testPath = $functionPath -replace ".ps1", ".Tests.ps1" -replace [regex]::Escape("$($slash)NetworkAnalyzer$($slash)P"), [regex]::Escape("$($slash)Tests$($slash)P")
+      Test-Path $testPath | Should -Be $true
+      $testPath | Should -FileContentMatch "Describe '$functionName'"
     }
   }
 
