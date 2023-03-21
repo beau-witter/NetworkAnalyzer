@@ -57,7 +57,7 @@ PowerShellVersion = '7.0'
 # RequiredAssemblies = @()
 
 # Script files (.ps1) that are run in the caller's environment prior to importing this module.
-# ScriptsToProcess = ''
+# ScriptsToProcess = @()
 
 # Type files (.ps1xml) to be loaded when importing this module
 # TypesToProcess = @()
@@ -69,7 +69,9 @@ PowerShellVersion = '7.0'
 # NestedModules = @()
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-FunctionsToExport = 'Get-RandomGuid', 'Restart-NetAdapter', 'Measure-NetworkSpeed', 'Start-SpeedTest'
+FunctionsToExport = 'Add-NetworkAnalyzerConfigurationValue', 'Measure-NetworkSpeed', 
+               'Restart-NetAdapter', 'Set-NetworkAnalyzerConfiguration', 
+               'Start-SpeedTest'
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = @()
@@ -120,7 +122,7 @@ PrivateData = @{
 
     } # End of PSData hashtable
 
-} # End of PrivateData hashtable
+ } # End of PrivateData hashtable
 
 # HelpInfo URI of this module
 # HelpInfoURI = ''
