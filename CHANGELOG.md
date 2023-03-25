@@ -8,14 +8,35 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0), 
 
 ### Added
 
-- Test-IsElevated private function. Allows for better explanation for certain actions' availability.
-- Restart-NetAdapter public function. Now we can restart a net adapter as a network-fixing step.
-- ScriptToProcess "GoLangSetup". Ensures that both GoLang exists and is configured for our use.
+#### Private functions
+- Test-IsElevated - Allows for better explanation for certain actions' availability.
+- Format-MetricResults - Shapes the output to be consistent.
+- New-NetworkMetric - Creates and returns a well defined object from the speed test results for later use.
+- New-Status - Creates and returns a well defined object from a determined "outcome" of the speed test for later use.
+- Write-SpeedTestResults - Outputs the SpeedTestResults based on configuration.
+
+#### Public functions
+- Restart-NetAdapter - Now we can restart a net adapter as a network-fixing step.
+- Set-NetworkAnalyzerConfigurationValue - Persists the configuration for Start-SpeedTest into a file.
+
+#### Other
+- Generate-Ndt7-ClientExecutable - Creates the most up to date exe for running the speed test.
 
 ### Fixed
 
 - Ensure PSModule path is set properly for smoother testing.
 - Allow for functions to have no params and still pass the module analyzer.
+- No longer measure the wrong results every time.
+- Reference to Home folder is now OS agnostic.
+
+### Changed
+
+- Made a Tests folder that mirrors the structure of the NetworkAnalyzer folder to split functions from their tests.
+- Move Scripts folder to the top level.
+
+### Removed
+
+- Initial template function and test have been removed now that real functions exist.
 
 ## [0.1.0] - 2023-03-01
 
