@@ -38,10 +38,10 @@ function Write-SpeedTestResults {
 ---------------------------------------
 | Metric      | Measurement  | Status |
 ---------------------------------------
-  Download      $dlt $($download.Status.StatusUnicode)
-  Upload        $ult $($upload.Status.StatusUnicode)
-  Ping          $pit $($ping.Status.StatusUnicode)
-  Packet Loss   $plt $($packetLoss.Status.StatusUnicode)
+  Download      $dlt $($SpeedTestResults.Download.Status.StatusUnicode)
+  Upload        $ult $($SpeedTestResults.Upload.Status.StatusUnicode)
+  Ping          $pit $($SpeedTestResults.Ping.Status.StatusUnicode)
+  Packet Loss   $plt $($SpeedTestResults.PacketLoss.Status.StatusUnicode)
 "@
             Write-Host $hereString
         }
@@ -51,10 +51,10 @@ function Write-SpeedTestResults {
     {
         if($Basic)
         {
-            New-BurntToastNotification -UniqueIdentifier "download" -Text "Download Results", "Speed: $($SpeedTestResults.Download.Result.Text)"
-            New-BurntToastNotification -UniqueIdentifier "upload" -Text "Upload Results", "Speed: $($SpeedTestResults.Upload.Result.Text)"
-            New-BurntToastNotification -UniqueIdentifier "ping" -Text "Ping Results", "Latency: $($SpeedTestResults.Ping.Result.Text)"
-            New-BurntToastNotification -UniqueIdentifier "packetloss" -Text "Packet Loss Results", "Loss Percentage: $($SpeedTestResults.PacketLoss.Result.Text)"
+            New-BurntToastNotification -UniqueIdentifier "download" -Text "Download Results", "Speed: $($SpeedTestResults.Download.Result.Text)" -AppLogo "None" 3> $null
+            New-BurntToastNotification -UniqueIdentifier "upload" -Text "Upload Results", "Speed: $($SpeedTestResults.Upload.Result.Text)" -AppLogo "None" 3> $null
+            New-BurntToastNotification -UniqueIdentifier "ping" -Text "Ping Results", "Latency: $($SpeedTestResults.Ping.Result.Text)" -AppLogo "None" 3> $null
+            New-BurntToastNotification -UniqueIdentifier "packetloss" -Text "Packet Loss Results", "Loss Percentage: $($SpeedTestResults.PacketLoss.Result.Text)" -AppLogo "None" 3> $null
         }
         else
         {
