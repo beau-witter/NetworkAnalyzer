@@ -73,4 +73,29 @@ Describe 'Add-NetworkAnalyzerConfigurationValue' {
             $outObject | Should -BeLikeExactly $Expected
         }
     }
+
+    Context 'String ParameterSet' {
+        It 'writes an error if the provided key already exists on the input object without force' -TestCases @(
+            @{Key = "ConfigFilePath"; Value = "C:\Some\File\Path"; InputObject = [PsCustomObject]@{ConfigFilePath = "D:\Some\Other\Path"}}
+        ) {
+            Mock 'Write-Error' -ParameterFilter { $Message.Contains($Key) } @Module -Verifiable
+            $outObject = $InputObject | Add-NetworkAnalyzerConfigurationValue -StringKey $Key -StringValue $Value
+            $outObject | Should -BeExactly $InputObject
+            Should -InvokeVerifiable
+        }
+
+        It 'adds the key and value to the object if it does not already exist on the input object' -TestCases @(
+            @{Key = "ConfigFilePath"; Value = "C:\Some\File\Path"; Expected = [PsCustomObject]@{ConfigFilePath = "C:\Some\File\Path"}}
+        ) {
+            $outObject = Add-NetworkAnalyzerConfigurationValue -StringKey $Key -StringValue $Value
+            $outObject | Should -BeLikeExactly $Expected
+        }
+
+        It 'adds the key and value to the object if it already exists on the input object with the -force switch' -TestCases @(
+            @{Key = "ConfigFilePath"; Value = "C:\Some\File\Path"; InputObject = [PsCustomObject]@{ConfigFilePath = "D:\Some\Other\Path"}; Expected = [PsCustomObject]@{ConfigFilePath = "C:\Some\File\Path"}}
+        ) {
+            $outObject = $InputObject | Add-NetworkAnalyzerConfigurationValue -StringKey $Key -StringValue $Value -Force
+            $outObject | Should -BeLikeExactly $Expected
+        }
+    }
 }

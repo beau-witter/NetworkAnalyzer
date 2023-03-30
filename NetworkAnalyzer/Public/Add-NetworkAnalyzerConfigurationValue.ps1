@@ -139,7 +139,7 @@ function Add-NetworkAnalyzerConfigurationValue {
             "String" {
                 if(($null -eq ($InputObject | Get-Member -MemberType NoteProperty | Where-Object {$_.Name -eq $StringKey})) -or $Force)
                 {
-                    $InputObject | Add-Member -MemberType NoteProperty -Name $StringKey -Value $StringKey -Force -PassThru
+                    $InputObject | Add-Member -MemberType NoteProperty -Name $StringKey -Value $StringValue -Force -PassThru
                 }
                 else
                 {
