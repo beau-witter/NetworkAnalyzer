@@ -11,8 +11,8 @@
         [string] name of a configuration variable whose value is of type
         [single]. Used in conjunction with SingleValue.
 
-        Valid values are: "MaximumDownload", "MaximumUpload", "UpperBoundPercent",
-        "LowerBoundPercent", "UpperDownloadThreshold", "LowerDownloadThreshold",
+        Valid values are: "MaximumDownload", "MaximumUpload", "MaximumPing", "MaximumPacketLoss",
+        "UpperBoundPercent", "LowerBoundPercent", "UpperDownloadThreshold", "LowerDownloadThreshold",
         "UpperUploadThreshold", "LowerUploadThreshold", "UpperPingThreshold",
         "LowerPingThreshold", "UpperPacketLossThreshold", "LowerPacketLossThreshold"
 
@@ -86,8 +86,8 @@
 
     .OUTPUTS
         [PsCustomObject] of valid Key-Value pairs consisting of the following
-        possible keys: "MaximumDownload", "MaximumUpload", "UpperBoundPercent",
-        "LowerBoundPercent", "UpperDownloadThreshold", "LowerDownloadThreshold",
+        possible keys: "MaximumDownload", "MaximumUpload", "MaximumPing", "MaximumPacketLoss",
+        "UpperBoundPercent", "LowerBoundPercent", "UpperDownloadThreshold", "LowerDownloadThreshold",
         "UpperUploadThreshold", "LowerUploadThreshold", "UpperPingThreshold",
         "LowerPingThreshold", "UpperPacketLossThreshold", "LowerPacketLossThreshold",
         "ConfigFilePath", "Mode", "NoToast", "NoCli"
@@ -97,8 +97,8 @@ function Add-NetworkAnalyzerConfigurationValue {
     [CmdletBinding(DefaultParameterSetName = "Single")]
     param(
         [Parameter(Mandatory = $true, ParameterSetName = "Single")]
-        [ValidateSet("MaximumDownload", "MaximumUpload", "UpperBoundPercent",
-        "LowerBoundPercent", "UpperDownloadThreshold", "LowerDownloadThreshold",
+        [ValidateSet("MaximumDownload", "MaximumUpload", "MaximumPing", "MaximumPacketLoss",
+        "UpperBoundPercent", "LowerBoundPercent", "UpperDownloadThreshold", "LowerDownloadThreshold",
         "UpperUploadThreshold", "LowerUploadThreshold", "UpperPingThreshold",
         "LowerPingThreshold", "UpperPacketLossThreshold", "LowerPacketLossThreshold")]
         [string] $SingleKey,
@@ -121,13 +121,14 @@ function Add-NetworkAnalyzerConfigurationValue {
         switch($PSCmdlet.ParameterSetName)
         {
             "Single" {
-                if($SingleKey -in @("UpperBoundPercent", "LowerBoundPercent") -and ($SingleValue -lt 0 -or $SingleValue -gt 1))
+                if($SingleKey -in @("UpperBoundPercent", "LowerBoundPercent", "MaximumPacketLoss", "UpperPacketLossThreshold", "LowerPacketLossThreshold") -and ($SingleValue -lt 0 -or $SingleValue -gt 1))
                 {
                     throw "$SingleKey can only contain values between 0.0 and 1.0 inclusive."
                 }
     
                 if(($null -eq ($InputObject | Get-Member -MemberType NoteProperty | Where-Object {$_.Name -eq $SingleKey})) -or $Force)
                 {
+                    Write-Verbose "$SingleKey : $SingleValue added to input object."
                     $InputObject | Add-Member -MemberType NoteProperty -Name $SingleKey -Value $SingleValue -Force -PassThru
                 }
                 else
@@ -139,6 +140,7 @@ function Add-NetworkAnalyzerConfigurationValue {
             "String" {
                 if(($null -eq ($InputObject | Get-Member -MemberType NoteProperty | Where-Object {$_.Name -eq $StringKey})) -or $Force)
                 {
+                    Write-Verbose "$StringKey : $StringValue added to input object."
                     $InputObject | Add-Member -MemberType NoteProperty -Name $StringKey -Value $StringValue -Force -PassThru
                 }
                 else
@@ -150,6 +152,7 @@ function Add-NetworkAnalyzerConfigurationValue {
             "Enum" {
                 if(($null -eq ($InputObject | Get-Member -MemberType NoteProperty | Where-Object {$_.Name -eq $EnumKey})) -or $Force)
                 {
+                    Write-Verbose "$EnumKey : $EnumValue added to input object."
                     $InputObject | Add-Member -MemberType NoteProperty -Name $EnumKey -Value $EnumValue -Force -PassThru
                 }
                 else
@@ -161,6 +164,7 @@ function Add-NetworkAnalyzerConfigurationValue {
             "Switch" {
                 if(($null -eq ($InputObject | Get-Member -MemberType NoteProperty | Where-Object {$_.Name -eq $SwitchKey})) -or $Force)
                 {
+                    Write-Verbose "$SwitchKey : $SwitchValue added to input object."
                     $InputObject | Add-Member -MemberType NoteProperty -Name $SwitchKey -Value $SwitchValue -Force -PassThru
                 }
                 else
