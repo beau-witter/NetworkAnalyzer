@@ -49,10 +49,10 @@ function Set-NetworkAnalyzerConfiguration {
         $configFileContents ??= [PSCustomObject]@{}
     }
     process {
-        $SingleKeys = "MaximumDownload", "MaximumUpload", "UpperDownloadThreshold", "LowerDownloadThreshold",
-                        "UpperUploadThreshold", "LowerUploadThreshold", "UpperPingThreshold", "LowerPingThreshold",
-                        "UpperPacketLossThreshold", "LowerPacketLossThreshold"
-        $PercentKeys = "UpperBoundPercent", "LowerBoundPercent"
+        $SingleKeys = "MaximumDownload", "MaximumUpload", "MaximumPing", "UpperDownloadThreshold", "LowerDownloadThreshold",
+                        "UpperUploadThreshold", "LowerUploadThreshold", "UpperPingThreshold", "LowerPingThreshold"
+        $PercentKeys = "UpperBoundPercent", "LowerBoundPercent", "MaximumPacketLoss", "UpperPacketLossThreshold",
+                        "LowerPacketLossThreshold"
         $StringKeys = "ConfigFilePath"
         $EnumKeys = "Mode"
         $SwitchKeys = "NoToast", "NoCli"
@@ -146,6 +146,9 @@ function Set-NetworkAnalyzerConfiguration {
                 Write-Warning "The Key $_ had an invalid value of $($InputObject.$_). Expected $true or $false."
             }
         }
+
+        Write-Verbose "Path: $Path"
+        Write-Verbose "Persisting the object: $InputObject"
 
         $configFileContents | ConvertTo-Json | Set-Content -Path $Path
     }
