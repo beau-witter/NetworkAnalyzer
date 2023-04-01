@@ -17,7 +17,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0), 
 
 #### Public functions
 - Restart-NetAdapter - Now we can restart a net adapter as a network-fixing step.
-- Set-NetworkAnalyzerConfigurationValue - Persists the configuration for Start-SpeedTest into a file.
+- Set-NetworkAnalyzerConfiguration - Persists the configuration for Start-SpeedTest into a file.
+- Add-NetworkAnalyzerConfigurationValue - Adds a key-value pair of configuration to a config object.
 
 #### Other
 - Generate-Ndt7-ClientExecutable - Creates the most up to date exe for running the speed test.
