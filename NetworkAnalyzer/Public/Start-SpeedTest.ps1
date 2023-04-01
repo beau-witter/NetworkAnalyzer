@@ -6,11 +6,23 @@
         Runs the Measure-NetworkSpeed function and then takes those results
         with the paramters passed in to create a report of your current speeds.
 
+    .PARAMETER Mode
+        [string] One of "AbsoluteThreshold", "PercentThreshold" or "Basic"
+        modes that determines which inputs are required and how to report
+        results.
+    
     .PARAMETER MaximumDownload
         [single] The maximum download speed for your internet plan in mbps.
 
     .PARAMETER MaximumUpload
         [single] The maximum upload speed for your internet plan in mbps.
+
+    .PARAMETER MaximumPing
+        [single] The highest ping amount that you would feel comfortable seeing.
+
+    .PARAMETER MaximumPacketLoss
+        [single] The highest packet loss percent (0.0 - 1.0 inclusive) that you
+        would feel comfortable seeing.
     
     .PARAMETER UpperBoundPercent
         [single] The percent of your maximum internet speeds that determines
@@ -20,12 +32,50 @@
         [single] The percent of your maximum internet speeds that determines
         whether the result is "ok" or "poor".
 
+    .PARAMETER UpperDownloadThreshold
+        [single] The user determined threshold between "Great" and "Fair" download
+        speeds.
+
+    .PARAMETER LowerDownloadThreshold
+        [single] The user determined threshold between "Fair" and "Bad" download
+        speeds.
+
+    .PARAMETER UpperUploadThreshold
+        [single] The user determined threshold between "Great" and "Fair" upload
+        speeds.
+
+    .PARAMETER LowerUploadThreshold
+        [single] The user determined threshold between "Fair" and "Bad" upload
+        speeds.
+
+    .PARAMETER UpperPingThreshold
+        [single] The user determined threshold between "Fair" and "Bad" ping delays.
+
+    .PARAMETER LowerPingThreshold
+        [single] The user determined threshold between "Great" and "Fair" ping delays.
+
+    .PARAMETER UpperPacketLossThreshold
+        [single] The user determined threshold between "Fair" and "Bad" packet
+        loss percent.
+
+    .PARAMETER LowerPacketLossThreshold
+        [single] The user determined threshold between "Great" and "Fair" packet
+        loss percent.
+
+    .PARAMETER ConfigFilePath
+        [string] The file location to look for the an existing configuration file
+        for preconfigured values.
+
     .PARAMETER NoToast
         [switch] Indicates that the output should not be displayed via Windows
         Notification (Toast).
 
     .PARAMETER NoCLI
         [switch] Indicates that the output should not be displayed via the CLI.
+
+    .PARAMETER PassThru
+        [switch] Indicates that the PsCustomObject formed from the results should
+        be directed to the Output Stream.
 
     .EXAMPLE
         Start-SpeedTest 100 100
@@ -45,7 +95,7 @@ function Start-SpeedTest {
         [Parameter(ParameterSetName = "PercentThreshold")][single] $MaximumDownload,
         [Parameter(ParameterSetName = "PercentThreshold")][single] $MaximumUpload,
         [Parameter(ParameterSetName = "PercentThreshold")][single] $MaximumPing,
-        [Parameter(ParameterSetName = "PercentThreshold")][single] $MaximumPacketLoss,
+        [Parameter(ParameterSetName = "PercentThreshold")][ValidateRange(0,1)][single] $MaximumPacketLoss,
         [Parameter(ParameterSetName = "PercentThreshold")][ValidateRange(0,1)][single] $UpperBoundPercent = 0.70,
         [Parameter(ParameterSetName = "PercentThreshold")][ValidateRange(0,1)][single] $LowerBoundPercent = 0.40,
         [Parameter(ParameterSetName = "AbsoluteThreshold")][single] $UpperDownloadThreshold,
@@ -54,8 +104,8 @@ function Start-SpeedTest {
         [Parameter(ParameterSetName = "AbsoluteThreshold")][single] $LowerUploadThreshold,
         [Parameter(ParameterSetName = "AbsoluteThreshold")][single] $UpperPingThreshold,
         [Parameter(ParameterSetName = "AbsoluteThreshold")][single] $LowerPingThreshold,
-        [Parameter(ParameterSetName = "AbsoluteThreshold")][single] $UpperPacketLossThreshold,
-        [Parameter(ParameterSetName = "AbsoluteThreshold")][single] $LowerPacketLossThreshold,
+        [Parameter(ParameterSetName = "AbsoluteThreshold")][ValidateRange(0,1)][single] $UpperPacketLossThreshold,
+        [Parameter(ParameterSetName = "AbsoluteThreshold")][ValidateRange(0,1)][single] $LowerPacketLossThreshold,
         [Parameter()][string] $ConfigFilePath = "$HOME/network-analyzer.config",
         [Parameter()][switch] $NoToast,
         [Parameter()][switch] $NoCLI,
@@ -64,6 +114,8 @@ function Start-SpeedTest {
 
     # Read Configuration
     # Read-NetworkAnalyzerConfiguration
+
+    Write-Verbose "Mode determined: $Mode"
 
     if($NoToast -and $NoCLI -and (-not $PassThru))
     {
