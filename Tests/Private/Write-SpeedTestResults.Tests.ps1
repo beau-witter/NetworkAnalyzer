@@ -9,6 +9,7 @@ BeforeAll {
 Describe 'Write-SpeedTestResults' {
     BeforeAll {
         Mock "Write-Host" {$Object} @Module
+        Mock 'Write-Verbose' @Module
     }
 
     Context 'CLI Output' {
