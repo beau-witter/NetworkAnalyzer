@@ -81,7 +81,7 @@ Describe "'<_>' Function Tests" -ForEach $functionPaths {
     $functionPath = $_
   }
   
-  Context "Function Code Style Tests" {
+  Context "$($ParsedFunction.Name) Code Style Tests" {
     It "should be an advanced function" {
       $functionPath | Should -FileContentMatch 'Function'
       $functionPath | Should -FileContentMatch 'CmdletBinding'
@@ -107,7 +107,7 @@ Describe "'<_>' Function Tests" -ForEach $functionPaths {
     }
   }
 
-  Context "Function Help Quality Tests" {
+  Context "$($ParsedFunction.Name) Help Quality Tests" {
     BeforeAll {
       # Getting function help
       $AbstractSyntaxTree = [System.Management.Automation.Language.Parser]::ParseInput((Get-Content -raw $functionPath), [ref]$null, [ref]$null)
