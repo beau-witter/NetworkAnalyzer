@@ -51,7 +51,7 @@ function Set-NetworkAnalyzerConfiguration {
     process {
         $SingleKeys = "MaximumDownload", "MaximumUpload", "MaximumPing", "UpperDownloadThreshold", "LowerDownloadThreshold",
                         "UpperUploadThreshold", "LowerUploadThreshold", "UpperPingThreshold", "LowerPingThreshold"
-        $PercentKeys = "UpperBoundPercent", "LowerBoundPercent", "MaximumPacketLoss", "UpperPacketLossThreshold",
+        $PercentKeys = "MaximumPacketLoss", "UpperBoundPercent", "LowerBoundPercent", "UpperPacketLossThreshold",
                         "LowerPacketLossThreshold"
         $StringKeys = "ConfigFilePath"
         $EnumKeys = "Mode"
@@ -83,7 +83,7 @@ function Set-NetworkAnalyzerConfiguration {
                                 Select-Object -ExpandProperty Name
         
         $PresentSingleKeys | ForEach-Object {
-            if($InputObject.$_ -as [single])
+            if($null -ne ($InputObject.$_ -as [single]))
             {
                 $configFileContents | Add-Member -MemberType NoteProperty -Name $_ -Value $InputObject.$_ -Force
             }
@@ -94,7 +94,7 @@ function Set-NetworkAnalyzerConfiguration {
         }
 
         $PresentPercentKeys | ForEach-Object {
-            if($InputObject.$_ -as [single] -and ([single]$InputObject.$_ -ge 0 -and [single]$InputObject.$_ -le 1))
+            if(($null -ne ($InputObject.$_ -as [single])) -and ([single]$InputObject.$_ -ge 0.0 -and [single]$InputObject.$_ -le 1.0))
             {
                 $configFileContents | Add-Member -MemberType NoteProperty -Name $_ -Value $InputObject.$_ -Force
             }
@@ -105,7 +105,7 @@ function Set-NetworkAnalyzerConfiguration {
         }
 
         $PresentStringKeys | ForEach-Object {
-            if($InputObject.$_ -as [string])
+            if($InputObject.$_ -is [string])
             {
                 $configFileContents | Add-Member -MemberType NoteProperty -Name $_ -Value $InputObject.$_ -Force
             }
@@ -117,7 +117,7 @@ function Set-NetworkAnalyzerConfiguration {
 
         $validEnums = "PercentThreshold", "AbsoluteThreshold", "Simple"
         $PresentEnumKeys | ForEach-Object {
-            if($InputObject.$_ -as [string] -and $InputObject.$_ -in $validEnums)
+            if($InputObject.$_ -is [string] -and $InputObject.$_ -in $validEnums)
             {
                 $configFileContents | Add-Member -MemberType NoteProperty -Name $_ -Value $InputObject.$_ -Force
             }
@@ -147,9 +147,12 @@ function Set-NetworkAnalyzerConfiguration {
             }
         }
 
-        Write-Verbose "Path: $Path"
-        Write-Verbose "Persisting the object: $InputObject"
-
-        $configFileContents | ConvertTo-Json | Set-Content -Path $Path
+        if($null -ne ($configFileContents | Get-Member -MemberType NoteProperty))
+        {
+            Write-Verbose "Path: $Path"
+            Write-Verbose "Persisting the object: $configFileContents"
+    
+            $configFileContents | ConvertTo-Json | Set-Content -Path $Path
+        }
     }
 }
