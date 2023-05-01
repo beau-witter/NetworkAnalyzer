@@ -78,7 +78,7 @@ jobs:
         run: Invoke-Build -Task CodeCoverage
 
       - name: Generate Code Coverage Report
-        uses: danielpalme/ReportGenerator-GitHub-Action@5.1.18
+        uses: danielpalme/ReportGenerator-GitHub-Action@5.1.20
         with:
           reports: build/**/CodeCoverageResults_PS*.xml
           targetDir: coveragereports
